@@ -1,22 +1,24 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 import customtkinter as ctk
-from tkinter import messagebox, ttk
+from tkinter import messagebox, ttk, filedialog
+import plotly.express as px
+import plotly.graph_objects as go
 
 # Configura o tema do customtkinter
-ctk.set_appearance_mode("System")  # "Dark" ou "Light" ou "System"
-ctk.set_default_color_theme("blue")  # blue, dark-blue, green
+ctk.set_appearance_mode("System")
+ctk.set_default_color_theme("blue")
 
-# Usuário e senha válidos (exemplo)
 USUARIO_VALIDO = "admin"
 SENHA_VALIDA = "1234"
 
-# --- Carregar CSV ---
 df = pd.read_csv('focos_br_todos-sats_2024.csv', parse_dates=['data_pas'], nrows=100000)
 df.columns = df.columns.str.strip().str.lower().str.replace(' ', '_')
 df['data_pas'] = pd.to_datetime(df['data_pas'], errors='coerce')
-
 df_atual = df.copy()
+
+# Variável global para manter o filtro atual do município
+filtro_municipio = ""
 
 def validar_login():
     usuario = entry_usuario.get()
@@ -30,28 +32,40 @@ def validar_login():
         entry_usuario.focus_set()
 
 def montar_interface_principal():
-    # Limpa a janela
     for widget in root.winfo_children():
         widget.destroy()
 
     root.title("Consulta de Queimadas - 2024")
-    root.geometry("1000x650")
+    root.geometry("1700x990")
     root.configure(bg=ctk.ThemeManager.theme["CTk"]["fg_color"])
 
     # Frame topo
     frame_top = ctk.CTkFrame(root)
     frame_top.pack(pady=10, padx=10, fill="x")
 
-    label_filtro = ctk.CTkLabel(frame_top, text="Filtrar por Estado:", font=ctk.CTkFont(size=14))
-    label_filtro.pack(side="left", padx=5)
-
+    # Filtro Estado
     global combo_uf
     ufs = ['Todos'] + sorted(df['estado'].unique())
+    label_filtro = ctk.CTkLabel(frame_top, text="Filtrar por Estado:", font=ctk.CTkFont(size=14))
+    label_filtro.pack(side="left", padx=5)
     combo_uf = ctk.CTkComboBox(frame_top, values=ufs, width=180, font=ctk.CTkFont(size=13))
     combo_uf.set("Todos")
     combo_uf.pack(side="left")
-    combo_uf.configure(command=filtrar_uf)  # CORREÇÃO AQUI
+    combo_uf.configure(command=filtrar_uf)
 
+    # Filtro Município (novo)
+    global entry_municipio_filter
+    label_muni = ctk.CTkLabel(frame_top, text="Filtrar por Município:", font=ctk.CTkFont(size=14))
+    label_muni.pack(side="left", padx=10)
+    entry_municipio_filter = ctk.CTkEntry(frame_top, width=180, font=ctk.CTkFont(size=13))
+    entry_municipio_filter.pack(side="left")
+    entry_municipio_filter.bind("<KeyRelease>", lambda e: filtrar_municipio())
+
+    # Botão resetar filtros (novo)
+    btn_reset_filtros = ctk.CTkButton(frame_top, text="Resetar Filtros", width=140, command=resetar_filtros)
+    btn_reset_filtros.pack(side="left", padx=10)
+
+    # Botões principais
     btn_atualizar = ctk.CTkButton(frame_top, text="Editar Registro", width=140, command=editar_linha)
     btn_atualizar.pack(side="left", padx=10)
     criar_tooltip(btn_atualizar, "Editar a linha selecionada")
@@ -64,6 +78,15 @@ def montar_interface_principal():
     btn_grafico.pack(side="left", padx=10)
     criar_tooltip(btn_grafico, "Gerar gráfico comparativo dos itens selecionados")
 
+    btn_mapa_calor = ctk.CTkButton(frame_top, text="Mapa de Calor", fg_color="#a71515", hover_color="#5c0b0b", width=140, command=gerar_mapa_calor)
+    btn_mapa_calor.pack(side="left", padx=10)
+    criar_tooltip(btn_mapa_calor, "Gerar mapa de calor")
+
+    # Botão Exportar CSV (novo)
+    btn_exportar = ctk.CTkButton(frame_top, text="Exportar CSV", fg_color="#1976d2", hover_color="#0d47a1", width=140, command=exportar_csv)
+    btn_exportar.pack(side="left", padx=10)
+    criar_tooltip(btn_exportar, "Exportar dados filtrados para CSV")
+
     # Frame tabela
     frame_tabela = ctk.CTkFrame(root)
     frame_tabela.pack(padx=10, pady=10, fill="both", expand=True)
@@ -72,8 +95,8 @@ def montar_interface_principal():
     colunas = ("Data", "Estado", "Município", "Focos (FRP)")
     tree = ttk.Treeview(frame_tabela, columns=colunas, show="headings", selectmode="extended")
     for col in colunas:
-        tree.heading(col, text=col)
-        tree.column(col, anchor="center", width=220)
+        tree.heading(col, text=col, command=lambda c=col: ordenar_tabela(c, False))
+        tree.column(col, anchor="center", width=250)
 
     scroll_y = ctk.CTkScrollbar(frame_tabela, orientation="vertical", command=tree.yview)
     scroll_x = ctk.CTkScrollbar(frame_tabela, orientation="horizontal", command=tree.xview)
@@ -85,43 +108,152 @@ def montar_interface_principal():
 
     atualizar_tabela()
 
-def atualizar_tabela(filtro=None):
+def atualizar_tabela(filtro_estado=None, filtro_muni=None):
     global df_atual
     for row in tree.get_children():
         tree.delete(row)
     df_filtrado = df
-    if filtro and filtro != 'Todos':
-        df_filtrado = df[df['estado'] == filtro]
+
+    if filtro_estado and filtro_estado != 'Todos':
+        df_filtrado = df_filtrado[df_filtrado['estado'] == filtro_estado]
+
+    if filtro_muni:
+        df_filtrado = df_filtrado[df_filtrado['municipio'].str.contains(filtro_muni, case=False, na=False)]
+
     df_atual = df_filtrado
+
     for row in df_filtrado.itertuples():
         data_str = row.data_pas.date().isoformat() if pd.notnull(row.data_pas) else 'Data Inválida'
         tree.insert("", "end", iid=row.Index, values=(data_str, row.estado, row.municipio, row.frp))
 
 def filtrar_uf(valor_selecionado):
-    uf = valor_selecionado
-    if uf == 'Todos':
-        atualizar_tabela()
-    else:
-        atualizar_tabela(filtro=uf)
+    global filtro_municipio
+    filtro_uf = valor_selecionado
+    muni = entry_municipio_filter.get().strip() if entry_municipio_filter else ""
+    atualizar_tabela(filtro_estado=filtro_uf, filtro_muni=muni)
+
+def filtrar_municipio():
+    global filtro_municipio
+    filtro_municipio = entry_municipio_filter.get().strip()
+    filtro_uf = combo_uf.get() if combo_uf else 'Todos'
+    atualizar_tabela(filtro_estado=filtro_uf, filtro_muni=filtro_municipio)
+
+def resetar_filtros():
+    combo_uf.set("Todos")
+    entry_municipio_filter.delete(0, ctk.END)
+    atualizar_tabela()
+
+def ordenar_tabela(coluna, reverse):
+    # Mapeia o nome da coluna para a coluna do DataFrame
+    col_map = {
+        "Data": "data_pas",
+        "Estado": "estado",
+        "Município": "municipio",
+        "Focos (FRP)": "frp"
+    }
+    col_df = col_map.get(coluna, None)
+    if not col_df:
+        return
+
+    global df_atual
+    df_atual = df_atual.sort_values(by=col_df, ascending=not reverse)
+    atualizar_tabela_simples(df_atual)
+
+    # Alterna a ordem para próxima vez que clicar
+    # Remonta os comandos dos cabeçalhos com o inverso
+    for col in tree["columns"]:
+        if col == coluna:
+            tree.heading(col, command=lambda c=col, rev=not reverse: ordenar_tabela(c, rev))
+        else:
+            tree.heading(col, command=lambda c=col: ordenar_tabela(c, False))
+
+def atualizar_tabela_simples(df_filtrado):
+    for row in tree.get_children():
+        tree.delete(row)
+    for row in df_filtrado.itertuples():
+        data_str = row.data_pas.date().isoformat() if pd.notnull(row.data_pas) else 'Data Inválida'
+        tree.insert("", "end", iid=row.Index, values=(data_str, row.estado, row.municipio, row.frp))
+
+def exportar_csv():
+    if df_atual.empty:
+        messagebox.showinfo("Sem dados", "Não há dados para exportar.")
+        return
+    arquivo = filedialog.asksaveasfilename(defaultextension=".csv",
+                                           filetypes=[("CSV files", "*.csv"), ("All files", "*.*")])
+    if arquivo:
+        try:
+            df_atual.to_csv(arquivo, index=False)
+            messagebox.showinfo("Sucesso", f"Arquivo salvo em:\n{arquivo}")
+        except Exception as e:
+            messagebox.showerror("Erro", f"Falha ao salvar arquivo:\n{e}")
 
 def gerar_grafico():
     selecionados = tree.selection()
     if len(selecionados) < 2:
         messagebox.showwarning("Seleção insuficiente", "Selecione pelo menos duas linhas para comparar.")
         return
+
     indices = [int(iid) for iid in selecionados]
     dados = df.loc[indices]
 
     municipios = dados['municipio']
     focos = dados['frp']
 
-    plt.figure(figsize=(10,6))
-    plt.bar(municipios, focos, color='red')
-    plt.title("Comparação de fogo (FRP) entre municípios")
-    plt.ylabel("Fire Radiative Power (FRP)")
-    plt.xticks(rotation=45)
-    plt.tight_layout()
-    plt.show()
+    fig = go.Figure(data=[
+        go.Bar(
+            x=municipios,
+            y=focos,
+            marker_color='indianred',
+            hovertemplate='<b>%{x}</b><br>FRP: %{y}<extra></extra>'
+        )
+    ])
+
+    fig.update_layout(
+        title="Comparação de Focos (FRP) entre Municípios",
+        xaxis_title="Municípios",
+        yaxis_title="Fire Radiative Power (FRP)",
+        template="plotly_white",
+        xaxis_tickangle=-45,
+        height=600,
+        width=1000
+    )
+
+    fig.show()
+
+def gerar_mapa_calor():
+    selecionados = tree.selection()
+    if not selecionados:
+        messagebox.showwarning("Nenhuma seleção", "Selecione pelo menos uma linha para visualizar o mapa de calor.")
+        return
+
+    indices = [int(iid) for iid in selecionados]
+    dados = df.loc[indices]
+
+    if 'latitude' not in dados.columns or 'longitude' not in dados.columns:
+        messagebox.showerror("Erro de dados", "O arquivo CSV precisa conter as colunas 'latitude' e 'longitude'.")
+        return
+
+    # Filtra dados válidos (sem NaN)
+    dados = dados.dropna(subset=['latitude', 'longitude', 'frp'])
+
+    if dados.empty:
+        messagebox.showerror("Erro de dados", "As linhas selecionadas não contêm coordenadas válidas.")
+        return
+
+    fig = px.density_mapbox(
+        dados,
+        lat='latitude',
+        lon='longitude',
+        z='frp',
+        radius=20,
+        center=dict(lat=dados['latitude'].mean(), lon=dados['longitude'].mean()),
+        zoom=4,
+        mapbox_style="open-street-map",
+        color_continuous_scale="Hot",
+        title="Mapa de Calor - FRP (Fire Radiative Power)"
+    )
+
+    fig.show()
 
 def excluir_linhas():
     selecionados = tree.selection()
@@ -216,7 +348,7 @@ def criar_tooltip(widget, texto):
 root = ctk.CTk()
 root.title("Login")
 root.geometry("320x280")
-root.resizable(False, False)
+root.resizable(True, True)
 
 label_user = ctk.CTkLabel(root, text="Usuário:", font=ctk.CTkFont(size=14))
 label_user.pack(pady=(30, 5))
