@@ -48,8 +48,3 @@ O desenvolvimento segue o modelo **Desenvolvimento Rápido de Aplicações (RAD)
 - **Flexibilidade e adaptabilidade**, ajustando-se a novos requisitos e dados.
 - **Geração rápida de insights**, facilitando tomadas de decisão eficientes.
 
-## ⚡ Como Rodar o Projeto
-
-1. Clone o repositório:
-   ```bash
-   git clone <URL_DO_REPOSITÓRIO>
