@@ -107,3 +107,6 @@ Gráfico![Grafico](https://github.com/user-attachments/assets/822f23e7-c9d8-413e
 
 Mapa de Calor![MapaDeCalor](https://github.com/user-attachments/assets/7a3870cc-c82b-4ec8-8c63-3af3bd3e0985)
 
+### 📄 Relatório do Projeto
+
+[📥 Clique aqui para visualizar ou baixar o relatório em PDF](/Relátorio.pdf)
