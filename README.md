@@ -48,3 +48,47 @@ O desenvolvimento segue o modelo **Desenvolvimento Rápido de Aplicações (RAD)
 - **Flexibilidade e adaptabilidade**, ajustando-se a novos requisitos e dados.
 - **Geração rápida de insights**, facilitando tomadas de decisão eficientes.
 
+# 🚀 Como Executar o Sistema de Monitoramento de Queimadas
+
+Siga os passos abaixo para rodar o sistema localmente:
+
+---
+
+## 1️⃣ Clone o Repositório
+
+```bash
+git clone https://github.com/seu-usuario/queimadados.git
+cd queimadados
+```
+
+---
+
+## 2️⃣ Instale as Dependências
+
+Certifique-se de ter o Python 3.8 ou superior instalado.  
+Depois, instale as bibliotecas necessárias com:
+
+```bash
+pip install pandas matplotlib customtkinter plotly pillow
+```
+
+---
+
+## 3️⃣ Execute o Sistema
+
+Na raiz do projeto, execute o arquivo principal:
+
+```bash
+python app.py
+```
+
+---
+
+## 4️⃣ Faça Login
+
+- **Usuário:** `admin`  
+- **Senha:** `1234`
+
+Após o login, você poderá acessar a interface completa com filtros, tabela de dados, exportações, gráficos e mapa de calor.
+
+---
