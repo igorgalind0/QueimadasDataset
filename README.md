@@ -92,3 +92,18 @@ python app.py
 Após o login, você poderá acessar a interface completa com filtros, tabela de dados, exportações, gráficos e mapa de calor.
 
 ---
+### 🖼️ Capturas de Tela do Projeto
+
+
+![Tela de Login]![telaLogin](https://github.com/user-attachments/assets/6441eead-0e8a-45ff-9fad-60b6193111ea)
+
+![Página Inicial]![PaginaInicial](https://github.com/user-attachments/assets/b900761d-312e-45f7-bab1-d87ed1e843b9)
+
+![Consulta]![Consulta](https://github.com/user-attachments/assets/391d5c18-f615-4fad-8a7a-461edf3d16da)
+
+![Editar Registro]![ButtonEdit](https://github.com/user-attachments/assets/327c467b-8a2d-45e8-bb9c-22718683aa8e)
+
+![Gráfico]![Grafico](https://github.com/user-attachments/assets/822f23e7-c9d8-413e-81f4-5ad6cc8e3e71)
+
+![Mapa de Calor]![MapaDeCalor](https://github.com/user-attachments/assets/7a3870cc-c82b-4ec8-8c63-3af3bd3e0985)
+
