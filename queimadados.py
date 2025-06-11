@@ -38,6 +38,9 @@ def validar_login(root):
 
 #Criando Tela de Login
 def tela_login(root):
+    for widget in root.winfo_children():
+        widget.destroy()
+    
     global entry_usuario, entry_senha
     root.title("Login")
     root.geometry("700x400")
@@ -122,6 +125,9 @@ tela_login(root)
 
 #Criando tela página introdução
 def pagina_intro(root):
+    for widget in root.winfo_children():
+        widget.destroy()
+
     root.title("Página Inicial")
     root.geometry("1280x720")
     root.resizable(True, True)
@@ -151,7 +157,7 @@ def pagina_intro(root):
 
     # Título
     titulo1 = ctk.CTkLabel(frame_esquerda1,
-        text="QueimaDados: Monitoramento das queimadas em 2024",
+        text="O que é o QueimaDados",
         font=ctk.CTkFont(size=28, family="Arial Black"),
         wraplength=500,
         justify="left",
@@ -161,26 +167,12 @@ def pagina_intro(root):
 
     # Parágrafo
     texto1 = ctk.CTkLabel(frame_esquerda1,
-        text="Acompanhe os focos de queimadas no Brasil em tempo real. Com o QueimaDados, você visualiza mapas de calor, gráficos comparativos e acessa informações atualizadas sobre os incêndios que marcaram 2024.",
+        text="O QueimaDados é um sistema interativo para consultar, comparar e gerenciar dados de queimadas. Com poucos cliques, você acessa mapas, gráficos e relatórios para entender melhor o cenário ambiental do país.",
         font=ctk.CTkFont(size=16),
         wraplength=500,
         justify="left"
     )
     texto1.pack(anchor="w")
-
-    botao_ver_dados = ctk.CTkButton(
-        frame_esquerda1,
-        text="Ver dados",
-        width=140,
-        height=40,
-        font=ctk.CTkFont(size=16),
-        fg_color="#1F6AA5",
-        hover_color="#155A8A",
-        text_color="white",
-        corner_radius=8,
-        command=lambda: pagina_principal(root)  # Passando root aqui
-    )
-    botao_ver_dados.pack(anchor="w", pady=(30, 0))
 
     # Direita (Imagem)
     frame_direita1 = ctk.CTkFrame(frame_principal1, fg_color=bg_color)
@@ -217,7 +209,7 @@ def pagina_intro(root):
     frame_direita2.grid(row=0, column=1, sticky="nsew")
 
     titulo2 = ctk.CTkLabel(frame_direita2,
-        text="O que é o QueimaDados",
+        text="QueimaDados: Monitoramento das queimadas em 2024",
         font=ctk.CTkFont(size=28, family="Arial Black"),
         wraplength=500,
         justify="left",
@@ -226,13 +218,45 @@ def pagina_intro(root):
     titulo2.pack(anchor="w", pady=(0, 20))
 
     texto2 = ctk.CTkLabel(frame_direita2,
-        text="O QueimaDados é um sistema interativo para consultar, comparar e gerenciar dados de queimadas. Com poucos cliques, você acessa mapas, gráficos e relatórios para entender melhor o cenário ambiental do país.",
+        text="Acompanhe os focos de queimadas no Brasil em tempo real. Com o QueimaDados, você visualiza mapas de calor, gráficos comparativos e acessa informações atualizadas sobre os incêndios que marcaram 2024.",
         font=ctk.CTkFont(size=16),
         wraplength=500,
         justify="left"
     )
     texto2.pack(anchor="w")
 
+    frame_botoes_lado_a_lado = ctk.CTkFrame(frame_direita2, fg_color="transparent")
+    frame_botoes_lado_a_lado.pack(anchor="w", pady=(30, 0))
+
+    # Botão Ver dados
+    botao_ver_dados = ctk.CTkButton(
+        frame_botoes_lado_a_lado,
+        text="Ver dados",
+        width=140,
+        height=40,
+        font=ctk.CTkFont(size=16),
+        fg_color="#1F6AA5",
+        hover_color="#155A8A",
+        text_color="white",
+        corner_radius=8,
+        command=lambda: pagina_principal(root)
+    )
+    botao_ver_dados.pack(side="left", padx=(0, 10))
+
+    # Botão Voltar
+    botao_voltar = ctk.CTkButton(
+        frame_botoes_lado_a_lado,
+        text="Voltar",
+        width=140,
+        height=40,
+        font=ctk.CTkFont(size=16),
+        fg_color="#757575",
+        hover_color="#616161",
+        text_color="white",
+        corner_radius=8,
+        command=lambda: tela_login(root)
+    )
+    botao_voltar.pack(side="left")
 #-----------------------------------
 
 #Criando página principal (dados)
@@ -326,6 +350,10 @@ def pagina_principal(root):
     tree.pack(fill="both", expand=True)
 
     atualizar_tabela()
+
+    btn_voltar = ctk.CTkButton(root, text="Voltar", width=120, fg_color="#757575", hover_color="#616161", command=lambda: pagina_intro(root))
+    btn_voltar.pack(pady=(0, 15))
+    criar_tooltip(btn_voltar, "Voltar para a tela de login")
 
 #Função atualizar dados
 def atualizar_tabela(filtro_estado=None, filtro_muni=None):
