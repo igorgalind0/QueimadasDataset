@@ -37,7 +37,6 @@ O projeto tem como propósito:
 - **CustomTkinter**
 - **VSCode**
 - **GitHub**
-- **SQLite**
 - **Pandas**
 - **Plotly**
 
