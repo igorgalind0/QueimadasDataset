@@ -7,9 +7,11 @@ Este projeto tem como objetivo o monitoramento e análise de ocorrências de que
 ## 📂 Base de Dados
 
 ### 📊 Origem dos Dados
+
 Os dados utilizados foram obtidos do **Instituto Nacional de Pesquisas Espaciais (INPE)**, garantindo credibilidade e precisão nas análises. Este dataset abrange um período extenso, de **2003 a 2025**, permitindo uma compreensão ampla do fenômeno das queimadas no Brasil.
 
 ### 📝 Formato dos Dados
+
 - **Formato**: CSV
 - **Principais colunas**:
   - **Data**: Indica a data específica do foco de queimada.
@@ -18,7 +20,9 @@ Os dados utilizados foram obtidos do **Instituto Nacional de Pesquisas Espaciais
   - **Focos**: Quantidade proporcional de queimadas registradas na região.
 
 ### ⚙️ Pré-processamento Realizado
+
 Inicialmente, foi identificado um impacto na performance ao carregar o dataset completo. Para otimizar o desempenho e a fluidez do projeto, foi aplicado um filtro, utilizando apenas os **dados referentes ao ano de 2024**. Com essa abordagem, conseguimos:
+
 - Melhorar significativamente a execução da aplicação.
 - Reduzir o tempo de processamento.
 - Facilitar a análise de um período temporal relevante.
@@ -26,6 +30,7 @@ Inicialmente, foi identificado um impacto na performance ao carregar o dataset c
 ## 🏆 Objetivo do Projeto
 
 O projeto tem como propósito:
+
 - **Analisar padrões e tendências das queimadas** em diferentes biomas e regiões.
 - **Desenvolver métodos de mitigação** para preservar a fauna e flora.
 - **Reduzir emissões de gases poluentes**, contribuindo para a diminuição dos efeitos do aquecimento global.
@@ -33,6 +38,7 @@ O projeto tem como propósito:
 ## 🚀 Ferramentas e Tecnologias Utilizadas
 
 ### 🛠️ Linguagem e Frameworks
+
 - **Python**
 - **CustomTkinter**
 - **VSCode**
@@ -41,7 +47,9 @@ O projeto tem como propósito:
 - **Plotly**
 
 ### 🔬 Metodologia
+
 O desenvolvimento segue o modelo **Desenvolvimento Rápido de Aplicações (RAD)**, permitindo:
+
 - **Resposta ágil** às mudanças e necessidades do monitoramento.
 - **Prototipagem contínua**, garantindo validação rápida por especialistas.
 - **Flexibilidade e adaptabilidade**, ajustando-se a novos requisitos e dados.
@@ -85,14 +93,14 @@ python app.py
 
 ## 4️⃣ Faça Login
 
-- **Usuário:** `admin`  
+- **Usuário:** `admin`
 - **Senha:** `1234`
 
 Após o login, você poderá acessar a interface completa com filtros, tabela de dados, exportações, gráficos e mapa de calor.
 
 ---
-### 🖼️ Capturas de Tela do Projeto
 
+### 🖼️ Capturas de Tela do Projeto
 
 Tela de Login![telaLogin](https://github.com/user-attachments/assets/6441eead-0e8a-45ff-9fad-60b6193111ea)
 
@@ -108,6 +116,4 @@ Mapa de Calor![MapaDeCalor](https://github.com/user-attachments/assets/7a3870cc-
 
 ### 📄 Relatório do Projeto
 
-[📥 Clique aqui para visualizar ou baixar o relatório em PDF](./Relatório.pdf)
-
-
+[📥 Clique aqui para visualizar ou baixar o relatório em PDF](./QueimaDadosRelatório.pdf)
